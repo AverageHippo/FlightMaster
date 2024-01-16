@@ -8,11 +8,13 @@ using UnityEngine.UIElements;
 public class Player : MonoBehaviour {
     // Start is called before the first frame update
 
-    private float playerSpeed = 5f;
+    private float playerSpeed = 15f;
 
     private float fireRate = 0.5f;
 
     private float nextFire;
+
+    private int playerHealth = 3;
 
     public GameObject laserPrefab;
 
@@ -30,21 +32,21 @@ public class Player : MonoBehaviour {
         TrackPlayerMovement();
     }
 
-    void WrapXBounds(){
+    private void WrapXBounds(){
         if (transform.position.x > 11.3f) {
-            transform.position = new Vector3(-11.3f, transform.position.y);
+            transform.position = new Vector3(-11.3f, transform.position.y, 0);
         }
         else if (transform.position.x < -11.3f) {
-            transform.position = new Vector3(11.3f, transform.position.y);
+            transform.position = new Vector3(11.3f, transform.position.y, 0);
         }
     }
 
-    void ClampYBounds() {
+    private void ClampYBounds() {
         float positionY = Mathf.Clamp(transform.position.y, -5, 0);
-        transform.position = new Vector3(transform.position.x, positionY);
+        transform.position = new Vector3(transform.position.x, positionY, 0);
     }
 
-    void TrackPlayerMovement() {
+    private void TrackPlayerMovement() {
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical");
 
@@ -54,5 +56,18 @@ public class Player : MonoBehaviour {
 
         ClampYBounds();
         WrapXBounds();
+    }
+
+    private void OnCollisionEnter(Collision collision) {
+        
+        if (collision.gameObject.tag == "Enemy") {
+            Destroy(collision.gameObject);
+            Debug.Log("Destroyed");
+            playerHealth--;
+        }
+
+        if (playerHealth <= 0) {
+            Destroy(gameObject);
+        }
     }
 }
